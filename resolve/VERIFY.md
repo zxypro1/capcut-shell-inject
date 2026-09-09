@@ -1,24 +1,24 @@
-# Resolve Studio 21.1 原生 MCP 验证记录
+# Resolve Studio 21.1 native MCP verification log
 
-这不是可执行实现。Linux 环境跑不了 Resolve，也不要用社区包 `davinci-resolve-mcp` 冒充原生功能。
+This is not an implementation. This environment cannot run Resolve. Do not substitute the community package `davinci-resolve-mcp` for the native feature.
 
-## 前提
-- Resolve **Studio** 21.1（免费版只有控制台脚本，无外部 MCP）
-- 专用空项目。21.1 工程不能降回 20.3，不要打开正式项目
-- 入口：`File > Setup AI Assistants`
-- 官方客户端：Claude / Claude Code / Codex
-- 系统：macOS 15+ / Apple Silicon；进阶 AI 工具约 16GB 显存
+## Prerequisites
+- Resolve **Studio** 21.1 (the free edition has console scripts only, no external MCP)
+- A dedicated empty project. A 21.1 project cannot be opened in 20.3. Do not open a real project
+- Entry: `File > Setup AI Assistants`
+- Official clients: Claude / Claude Code / Codex
+- System: macOS 15+ / Apple Silicon. Advanced AI tools need about 16GB of VRAM
 
-## 官方示例（逐条记失败点）
-1. Media Pool 放入长片
-2. 生成约 3 分钟高光
-3. 删除短于 1 秒的剪辑
-4. 导出 H.265
+## Official example (log each failure)
+1. Put a long clip in the Media Pool
+2. Generate an about-3-minute highlight
+3. Delete cuts shorter than 1 second
+4. Export H.265
 
-| 步骤 | 结果 | 失败点 | 时间 |
+| Step | Result | Failure | Time |
 | --- | --- | --- | --- |
-| 安装/授权 Studio 21.1 | 未跑 | | |
-| Setup AI Assistants 接通 | 未跑 | | |
-| 长片 → 3min 高光 | 未跑 | | |
-| 删除 <1s 剪辑 | 未跑 | | |
-| H.265 导出 | 未跑 | | |
+| Install / license Studio 21.1 | not run | | |
+| Connect Setup AI Assistants | not run | | |
+| Long clip to 3min highlight | not run | | |
+| Delete cuts under 1s | not run | | |
+| H.265 export | not run | | |
