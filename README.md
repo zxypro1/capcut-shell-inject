@@ -1,27 +1,55 @@
 # CapCut draft loop
 
-Turn footage plus a script into an editable CapCut timeline: video, English subtitles, and a short voiceover.
+**Shell-first inject for CapCut 9.x:** create an empty project in the CapCut app, quit, then inject video + English subtitles + voiceover into that official shell so the timeline opens. Do not create drafts from outside CapCut.
 
-## Verified delivery shape (CapCut 9.3, macOS)
+Verified on international CapCut **9.3.0** (macOS) with shell `shell-opp2`.
 
-**Do not create a draft from outside CapCut.** CapCut 9.3 rejects CLI-created projects with:
+## One-liner
 
-> This draft comes from an unconventional path and cannot be used.
+> CapCut 9 rejects externally created drafts (“unconventional path”). This repo documents and scripts the path that works: **App shell → quit → inject → reopen**.
 
-The path that works:
+## vs CapCut MCP / plain `capcut-cli`
 
-1. In the CapCut app, create an **empty project** (the official shell).
+| | CapCut in-app / random MCP wrappers | `capcut-cli` alone | This repo |
+| --- | --- | --- | --- |
+| Create a new draft from disk | Often hits “unconventional path” on 9.3 | `quickstart` hits the same wall | **Does not create shells** — you create the shell in the app |
+| Edit an existing draft | Varies; many ignore 9.x mirrors | Strong JSON edits | Thin wrapper: inject + sync + register |
+| CapCut 8.7+ mirrors | Easy to miss `template-2.tmp` / nested `Timelines/` | Has `sync-timelines --nested` | Calls that after every inject |
+| Computer Use / UI automation | Common fragile path | Not required | Explicitly out of scope |
+| What we ship | — | General CLI | **Verified shell-first recipe** + `inject-shell.sh` |
+
+We depend on [`capcut-cli`](https://github.com/renezander030/capcut-cli). The product is the **accepted workflow**, not a fork of the CLI.
+
+## Demo (30s)
+
+Record this once CapCut shows a filled shell (pass criteria already verified):
+
+1. CapCut project list → open `shell-opp2` (no unconventional-path dialog)
+2. Timeline: ~5s video, 2 English cues, ~3.2s VO
+3. Scrub playhead across both subtitle lines
+
+Drop the recording at `docs/demo.mp4` (or link it from Releases) before flipping the repo public.
+
+## Verified flow
+
+1. In CapCut, create an **empty project** (official shell).
 2. Quit CapCut completely.
-3. Inject media into that shell with `capcut-cli` (or the script below).
-4. Keep the shell `platform` / `app_source` / path identity. Put media under the draft folder.
-5. Sync timeline mirrors (`draft_info.json`, `template-2.tmp`, nested `Timelines/`).
+3. Inject into that shell:
+
+```bash
+PROJECT="$HOME/Movies/CapCut/User Data/Projects/com.lveditor.draft/YOUR_SHELL" \
+  ./scripts/inject-shell.sh
+```
+
+4. Keep the shell `platform` / `app_source` / path identity. Media lands under the draft `assets/`.
+5. Script runs `sync-timelines --nested --apply` and `register --materials --apply`.
 6. Reopen CapCut and open the same project.
 
-Pass criteria we verified on international CapCut 9.3.0 with shell `shell-opp2`:
+Pass criteria:
 
-- Project opens without the unconventional-path error
+- Opens without “unconventional path”
 - Timeline has ~5s video, 2 English subtitle cues, ~3.2s voiceover
-- Media is readable (not marked missing)
+- Media is readable (not missing)
 
 ## Why shell-first
 
@@ -30,45 +58,27 @@ Pass criteria we verified on international CapCut 9.3.0 with shell `shell-opp2`:
 | CLI `quickstart` / external new draft | Rejected: unconventional path |
 | App-created empty shell + inject | Opens; timeline editable |
 
-On CapCut 8.7+, the app often reads `draft_info.json` / `template-2.tmp`, not a synthetic `draft_content.json`. Prefer writing through those mirrors and running `capcut sync-timelines <project> --nested --apply`.
+On CapCut 8.7+, the app often reads `draft_info.json` / `template-2.tmp`, not a synthetic `draft_content.json`.
 
-## Inject into an existing shell
+## Inject details
 
-Requires `ffmpeg`, `npx`, and a TTS command. On macOS, CapCut must be **fully quit** before writing.
+Requires `ffmpeg`, `npx`, and TTS (`say` on macOS or `espeak-ng` on Linux). CapCut must be **fully quit** before writing.
 
-```bash
-# PROJECT = path to the App-created draft folder
-PROJECT="$HOME/Movies/CapCut/User Data/Projects/com.lveditor.draft/shell-opp2" \
-  ./scripts/inject-shell.sh
-```
+Optional env: `VIDEO`, `SRT`, `TTS_TEXT`, `VO_WAV`.
 
-Optional env vars: `VIDEO`, `SRT`, `TTS_TEXT`, `TTS_CMD`.
-
-macOS voiceover default uses `say` via AIFF then converts to WAV (direct `say -o *.wav` often fails).
-
-```bash
-TTS_CMD='say -o {out} {text}'   # may fail for .wav; the script handles AIFF→WAV
-```
-
-What the script does:
-
-1. Ensures sample video / SRT / voiceover assets
-2. `capcut add-video` / `import-srt` / `add-audio` into `$PROJECT`
-3. `capcut sync-timelines "$PROJECT" --nested --apply`
-4. `capcut register "$PROJECT" --materials --apply`
-5. Prints track summary
+macOS: `say` writing `.wav` often fails; the script uses AIFF then converts to WAV.
 
 ## Linux smoke only
 
-`./scripts/draft-loop.sh` still builds a synthetic draft under `drafts/` for CI/smoke. That path is **not** CapCut-accepted on 9.3. Use it only to exercise commands; desktop acceptance requires the shell-first flow above.
+`./scripts/draft-loop.sh` builds a synthetic draft under `drafts/` for CI. CapCut 9.3 will **not** accept that draft. Desktop acceptance requires shell-first inject.
 
 ## Out of scope
 
 - Driving the CapCut UI (Computer Use)
 - Final export from CapCut
-- Resolve Studio 21.1 native MCP — see `resolve/VERIFY.md` (needs a Studio license; do not use community `davinci-resolve-mcp`)
+- Resolve Studio MCP — see `resolve/VERIFY.md`
 
 ## Tooling
 
-- [`capcut-cli`](https://github.com/renezander030/capcut-cli) for draft edits
+- [`capcut-cli`](https://github.com/renezander030/capcut-cli) for edits
 - Prefer international CapCut. Jianying 6+ drafts are often encrypted.
