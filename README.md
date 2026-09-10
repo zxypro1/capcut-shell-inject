@@ -22,11 +22,11 @@ We depend on [`capcut-cli`](https://github.com/renezander030/capcut-cli). The pr
 
 ## Demo (30s)
 
-Record this once CapCut shows a filled shell (pass criteria already verified):
+Contrast first, then success (see `docs/DEMO.md`):
 
-1. CapCut project list → open `shell-opp2` (no unconventional-path dialog)
-2. Timeline: ~5s video, 2 English cues, ~3.2s VO
-3. Scrub playhead across both subtitle lines
+1. Flash an externally created draft hitting **“unconventional path”**
+2. Open App-created shell `shell-opp2` (clean open)
+3. Timeline: ~5s video, 2 English cues, ~3.2s VO — scrub both subtitle lines
 
 Drop the recording at `docs/demo.mp4` (or link it from Releases) before flipping the repo public.
 
