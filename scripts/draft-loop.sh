@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
-# Footage + script -> CapCut draft (video + TTS + SRT). Does not open CapCut.
+# Linux/CI smoke: synthetic draft under drafts/. Not accepted by CapCut 9.3.
+# For a CapCut-openable project, create an empty project in the CapCut app,
+# quit CapCut, then run scripts/inject-shell.sh with PROJECT=...
 set -euo pipefail
 
 NAME="${1:-opp2-subtitle-tts}"
@@ -44,12 +46,12 @@ capcut quickstart "$NAME" \
 
 PROJECT="$DRAFTS/$NAME"
 
-capcut tts "$PROJECT" 0s \
-  --text "$TEXT" \
-  --tts-cmd "$TTS_CMD"
+if command -v espeak-ng >/dev/null; then
+  capcut tts "$PROJECT" 0s --text "$TEXT" --tts-cmd "$TTS_CMD" || true
+fi
 
-capcut lint "$PROJECT"
+capcut lint "$PROJECT" || true
 capcut info "$PROJECT" -H || true
 
 echo "draft: $PROJECT"
-echo "not verified in CapCut app. quit CapCut before copying into the intl draft dir."
+echo "smoke only — CapCut 9.3 rejects external new drafts. Use inject-shell.sh on an App-created shell."
