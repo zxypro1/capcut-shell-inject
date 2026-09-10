@@ -8,7 +8,9 @@
 
 ## One-liner
 
-> CapCut 9 rejects externally created drafts (“unconventional path”). This repo documents and scripts the path that works: **App shell → quit → inject → reopen**.
+> Shell-first inject so CapCut 9.x actually opens agent-written drafts.
+
+Not another CapCut MCP. Use it as the **step before** CapCut MCP / `capcut-cli` when 9.x refuses external drafts with “unconventional path”: **App shell → quit → inject → reopen**.
 
 ## vs CapCut MCP / plain `capcut-cli`
 
