@@ -1,4 +1,4 @@
-# CapCut draft loop
+# CapCut shell inject
 
 **Shell-first inject for CapCut 9.x:** create an empty project in the CapCut app, quit, then inject video + English subtitles + voiceover into that official shell so the timeline opens. Do not create drafts from outside CapCut.
 
@@ -77,6 +77,10 @@ macOS: `say` writing `.wav` often fails; the script uses AIFF then converts to W
 - Driving the CapCut UI (Computer Use)
 - Final export from CapCut
 - Resolve Studio MCP — see `resolve/VERIFY.md`
+
+## Troubleshooting
+
+See [`docs/TROUBLESHOOTING.md`](docs/TROUBLESHOOTING.md) for unconventional path, quit-before-write, 9.x mirrors, and missing media.
 
 ## Tooling
 
