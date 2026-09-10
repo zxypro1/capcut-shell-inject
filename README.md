@@ -1,8 +1,10 @@
 # CapCut shell inject
 
-**Shell-first inject for CapCut 9.x:** create an empty project in the CapCut app, quit, then inject video + English subtitles + voiceover into that official shell so the timeline opens. Do not create drafts from outside CapCut.
+**Problem:** CapCut 9.x rejects drafts created outside the app (“This draft comes from an unconventional path and cannot be used”). Agent and script pipelines that write JSON on disk often cannot open the project.
 
-Verified on international CapCut **9.3.0** (macOS) with shell `shell-opp2`.
+**Who it’s for:** developers wiring Agent / automated video workflows, and small teams that need footage + script to land as an **editable** CapCut timeline—not a locked MP4.
+
+**Value:** the last mile that actually opens—**App-created empty shell → quit → inject video / English subtitles / VO → reopen**. Verified on international CapCut **9.3.0** (macOS) with shell `shell-opp2`.
 
 ## One-liner
 
@@ -20,15 +22,9 @@ Verified on international CapCut **9.3.0** (macOS) with shell `shell-opp2`.
 
 We depend on [`capcut-cli`](https://github.com/renezander030/capcut-cli). The product is the **accepted workflow**, not a fork of the CLI.
 
-## Demo (30s)
+## Demo (optional)
 
-Contrast first, then success (see `docs/DEMO.md`):
-
-1. Flash an externally created draft hitting **“unconventional path”**
-2. Open App-created shell `shell-opp2` (clean open)
-3. Timeline: ~5s video, 2 English cues, ~3.2s VO — scrub both subtitle lines
-
-Drop the recording at `docs/demo.mp4` (or link it from Releases) before flipping the repo public.
+A contrast recording helps (see `docs/DEMO.md`): flash “unconventional path” on an external draft, then open `shell-opp2` and scrub the three tracks. Not required to use the script; add `docs/demo.mp4` when you have one.
 
 ## Verified flow
 
