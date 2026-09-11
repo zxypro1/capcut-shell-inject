@@ -6,48 +6,67 @@
 
 **Value:** the last mile that actually opens—**App-created empty shell → quit → inject video / English subtitles / VO → reopen**. Verified on international CapCut **9.3.0** (macOS) with shell `shell-opp2`.
 
-## One-liner
-
 > Shell-first inject so CapCut 9.x actually opens agent-written drafts.
 
-Not another CapCut MCP. Use it as the **step before** CapCut MCP / `capcut-cli` when 9.x refuses external drafts with “unconventional path”: **App shell → quit → inject → reopen**.
+Not another CapCut MCP. Use it as the **step before** CapCut MCP / `capcut-cli` when 9.x refuses external drafts.
 
-## vs CapCut MCP / plain `capcut-cli`
+## How to use
 
-| | CapCut in-app / random MCP wrappers | `capcut-cli` alone | This repo |
-| --- | --- | --- | --- |
-| Create a new draft from disk | Often hits “unconventional path” on 9.3 | `quickstart` hits the same wall | **Does not create shells** — you create the shell in the app |
-| Edit an existing draft | Varies; many ignore 9.x mirrors | Strong JSON edits | Thin wrapper: inject + sync + register |
-| CapCut 8.7+ mirrors | Easy to miss `template-2.tmp` / nested `Timelines/` | Has `sync-timelines --nested` | Calls that after every inject |
-| Computer Use / UI automation | Common fragile path | Not required | Explicitly out of scope |
-| What we ship | — | General CLI | **Verified shell-first recipe** + `inject-shell.sh` |
+### Requirements
 
-We depend on [`capcut-cli`](https://github.com/renezander030/capcut-cli). The product is the **accepted workflow**, not a fork of the CLI.
+- macOS with **international CapCut** (prefer 9.x; Jianying 6+ drafts are often encrypted)
+- `git`, `ffmpeg`, `npx` (Node.js)
+- TTS: macOS `say` (default) or `espeak-ng`
 
-## Demo (optional)
+### Steps
 
-A contrast recording helps (see `docs/DEMO.md`): flash “unconventional path” on an external draft, then open `shell-opp2` and scrub the three tracks. Not required to use the script; add `docs/demo.mp4` when you have one.
+1. **Create an empty project in CapCut** (File → New). Name it anything, e.g. `shell-opp2`.  
+   Do **not** create the draft folder yourself on disk.
 
-## Verified flow
+2. **Quit CapCut completely** (Cmd+Q). Autosave will overwrite external writes if the app is still running.
 
-1. In CapCut, create an **empty project** (official shell).
-2. Quit CapCut completely.
-3. Inject into that shell:
+3. **Clone and run inject** against that shell folder:
 
 ```bash
-PROJECT="$HOME/Movies/CapCut/User Data/Projects/com.lveditor.draft/YOUR_SHELL" \
+git clone https://github.com/zxypro1/capcut-shell-inject.git
+cd capcut-shell-inject
+
+# Default CapCut draft store on macOS:
+# ~/Movies/CapCut/User Data/Projects/com.lveditor.draft/<project-name>
+
+PROJECT="$HOME/Movies/CapCut/User Data/Projects/com.lveditor.draft/shell-opp2" \
   ./scripts/inject-shell.sh
 ```
 
-4. Keep the shell `platform` / `app_source` / path identity. Media lands under the draft `assets/`.
-5. Script runs `sync-timelines --nested --apply` and `register --materials --apply`.
-6. Reopen CapCut and open the same project.
+4. **Reopen CapCut** and open the same project.
 
-Pass criteria:
+### What you should see
 
-- Opens without “unconventional path”
-- Timeline has ~5s video, 2 English subtitle cues, ~3.2s voiceover
-- Media is readable (not missing)
+- Project opens (no “unconventional path” dialog)
+- Timeline: ~5s video, 2 English subtitle cues, ~3.2s voiceover
+- Media readable (not missing / no forced relink)
+
+### Use your own media
+
+```bash
+PROJECT="$HOME/Movies/CapCut/User Data/Projects/com.lveditor.draft/YOUR_SHELL" \
+VIDEO="/path/to/clip.mp4" \
+SRT="/path/to/captions.srt" \
+VO_WAV="/path/to/voiceover.wav" \
+  ./scripts/inject-shell.sh
+```
+
+Optional: `TTS_TEXT="Your line here"` if you omit `VO_WAV` and want the script to synthesize speech.
+
+### What the script does
+
+1. Ensures sample video / SRT / voiceover if you did not pass paths  
+2. `capcut add-video` / `import-srt` / `add-audio` into `$PROJECT`  
+3. `capcut sync-timelines "$PROJECT" --nested --apply` (CapCut 8.7+ mirrors)  
+4. `capcut register "$PROJECT" --materials --apply`  
+5. Prints track summary  
+
+Media is copied under `$PROJECT/assets/`. The shell’s `platform` / `app_source` identity is kept.
 
 ## Why shell-first
 
@@ -56,23 +75,24 @@ Pass criteria:
 | CLI `quickstart` / external new draft | Rejected: unconventional path |
 | App-created empty shell + inject | Opens; timeline editable |
 
-On CapCut 8.7+, the app often reads `draft_info.json` / `template-2.tmp`, not a synthetic `draft_content.json`.
+## vs CapCut MCP / plain `capcut-cli`
 
-## Inject details
+| | CapCut MCP wrappers | `capcut-cli` alone | This repo |
+| --- | --- | --- | --- |
+| Create a new draft from disk | Often hits unconventional path | Same wall via `quickstart` | **Does not create shells** — you create the shell in the app |
+| Edit an existing draft | Varies | Strong JSON edits | Inject + sync + register |
+| CapCut 8.7+ mirrors | Easy to miss | Has `sync-timelines --nested` | Called after every inject |
+| What we ship | — | General CLI | Verified shell-first recipe |
 
-Requires `ffmpeg`, `npx`, and TTS (`say` on macOS or `espeak-ng` on Linux). CapCut must be **fully quit** before writing.
-
-Optional env: `VIDEO`, `SRT`, `TTS_TEXT`, `VO_WAV`.
-
-macOS: `say` writing `.wav` often fails; the script uses AIFF then converts to WAV.
+Depends on [`capcut-cli`](https://github.com/renezander030/capcut-cli).
 
 ## Linux smoke only
 
-`./scripts/draft-loop.sh` builds a synthetic draft under `drafts/` for CI. CapCut 9.3 will **not** accept that draft. Desktop acceptance requires shell-first inject.
+`./scripts/draft-loop.sh` builds a synthetic draft under `drafts/` for CI. CapCut 9.3 will **not** accept that draft. Desktop use requires the **How to use** flow above.
 
 ## Resolve Studio MCP vs this repo
 
-Need a one-pager for “Studio can render / CapCut path is free”? See [`docs/RESOLVE_VS_CAPCUT.md`](docs/RESOLVE_VS_CAPCUT.md). Not a Studio license bypass.
+See [`docs/RESOLVE_VS_CAPCUT.md`](docs/RESOLVE_VS_CAPCUT.md). Not a Studio license bypass.
 
 ## Out of scope
 
@@ -82,9 +102,8 @@ Need a one-pager for “Studio can render / CapCut path is free”? See [`docs/R
 
 ## Troubleshooting
 
-See [`docs/TROUBLESHOOTING.md`](docs/TROUBLESHOOTING.md) for unconventional path, quit-before-write, 9.x mirrors, and missing media.
+See [`docs/TROUBLESHOOTING.md`](docs/TROUBLESHOOTING.md).
 
-## Tooling
+## Demo (optional)
 
-- [`capcut-cli`](https://github.com/renezander030/capcut-cli) for edits
-- Prefer international CapCut. Jianying 6+ drafts are often encrypted.
+See [`docs/DEMO.md`](docs/DEMO.md).
