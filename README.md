@@ -70,6 +70,10 @@ macOS: `say` writing `.wav` often fails; the script uses AIFF then converts to W
 
 `./scripts/draft-loop.sh` builds a synthetic draft under `drafts/` for CI. CapCut 9.3 will **not** accept that draft. Desktop acceptance requires shell-first inject.
 
+## Resolve Studio MCP vs this repo
+
+Need a one-pager for “Studio can render / CapCut path is free”? See [`docs/RESOLVE_VS_CAPCUT.md`](docs/RESOLVE_VS_CAPCUT.md). Not a Studio license bypass.
+
 ## Out of scope
 
 - Driving the CapCut UI (Computer Use)
