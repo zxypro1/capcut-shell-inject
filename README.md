@@ -75,6 +75,27 @@ Media is copied under `$PROJECT/assets/`. The shell’s `platform` / `app_source
 | CLI `quickstart` / external new draft | Rejected: unconventional path |
 | App-created empty shell + inject | Opens; timeline editable |
 
+## seed-from-store (capcut-cli 0.23+) vs this repo
+
+Upstream [`capcut-cli` **v0.23.0**](https://github.com/renezander030/capcut-cli/releases) changed how new drafts are born: `init` / `quickstart` / `compile` can **seed version markers and settings from the newest app-authored project** already in your local draft store (not its timeline content, not its `Timelines/`). That fixes many “unconventional path” failures caused by a stale bundled template (old `app_version` / empty `new_version`). The release notes credit and link this shell-first recipe.
+
+| | **seed-from-store** (CLI ≥ 0.23) | **App-create → quit → inject-shell** (this repo) |
+| --- | --- | --- |
+| What it fixes | Stale template / version markers on **new** CLI drafts | CapCut rejecting **externally authored** projects; last-mile media into an app shell |
+| Who creates the project folder | CLI, seeded from a local app project’s markers | **You**, inside CapCut (File → New), then quit |
+| Typical command | `capcut init` / `quickstart` / `compile` | `./scripts/inject-shell.sh` on `$PROJECT` |
+| Nested mirrors + materials | Still your responsibility after edits | Script runs `sync-timelines --nested` + `register --materials` |
+| Best when | You want CLI-created drafts that simply **open** on 9.x | Agent pipelines that must land **video + English SRT + VO** on an editable timeline |
+
+**When seed isn’t enough** (still use this repo):
+
+1. You already have (or want) an **empty app shell** and need inject + nested sync + materials register—not just a new blank with fresh markers.
+2. Seed only upgrades how the CLI **starts** a draft; it does not replace the verified inject loop for agent-written media.
+3. Media shows as missing / forced relink after a plain CLI write—`register --materials` on an app-authored shell still matters.
+4. You hit unconventional path on a draft that never lived as an app-created project (pure disk / wrong template identity).
+
+Upgrade `capcut-cli` for seeding; keep this recipe when the goal is **shell-first inject that CapCut 9.x actually opens**.
+
 ## vs CapCut MCP / plain `capcut-cli`
 
 | | CapCut MCP wrappers | `capcut-cli` alone | This repo |
